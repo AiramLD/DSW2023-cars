@@ -10,6 +10,8 @@ class Car {
   public $year;
   public $color;
 
+  private static $dataFile = '../data/cars.json';
+
 
   public function __construct($id, $make, $model, $year, $color)
   {
@@ -22,7 +24,7 @@ class Car {
 
   public static function getAll(){
     $cars= [];
-    $json = file_get_contents('../data/cars.json');
+    $json = file_get_contents(self::$dataFile);
     $carsJSON = json_decode($json);
     foreach ($carsJSON as $carJSON) {
       $cars[] = new Car($carJSON->id,$carJSON->make,$carJSON->model,$carJSON->year,$carJSON->color);
@@ -46,9 +48,22 @@ class Car {
         $cars[] = $car;
       }
     }
-    $jsonString =json_encode($cars, JSON_PRETTY_PRINT);
-    $file = fopen('../data/cars.json', 'w');
+    self::save($cars);
+  }
+
+  public static function create($car){
+
+    $cars = self::getAll();
+    $cars[] = $car;
+    self::save($cars);
+   
+  }
+
+  public static function save($data){
+    $jsonString =json_encode($data, JSON_PRETTY_PRINT);
+    $file = fopen(self::$dataFile, 'w');
     fwrite($file, $jsonString);
     fclose($file);
   }
 }
+
